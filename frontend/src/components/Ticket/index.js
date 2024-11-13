@@ -85,7 +85,6 @@ const Ticket = () => {
             history.push("/tickets");
             return;
           }
-
           setContact(data.contact);
           setTicket(data);
           setLoading(false);

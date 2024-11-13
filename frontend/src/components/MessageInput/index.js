@@ -311,6 +311,7 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 	};
 
+
 	const renderReplyingMessage = message => {
 		return (
 			<div className={classes.replyginMsgWrapper}>

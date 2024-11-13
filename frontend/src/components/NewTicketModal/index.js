@@ -144,10 +144,10 @@ const NewTicketModal = ({ modalOpen, onClose, initialContact }) => {
 
   const handleSaveTicket = async contactId => {
     if (!contactId) return;
-    if (selectedQueue === "" && user.profile !== 'admin') {
-      toast.error("Selecione uma fila");
-      return;
-    }
+    // if (selectedQueue === "" && user.profile !== 'admin') {
+    //   toast.error("Selecione uma fila");
+    //   return;
+    // }
     
     setLoading(true);
     try {
@@ -163,22 +163,14 @@ const NewTicketModal = ({ modalOpen, onClose, initialContact }) => {
 
       onClose(ticket);
     } catch (err) {
-      
-      const ticket  = JSON.parse(err.response.data.error);
 
-      if (ticket.userId !== user?.id) {
-        setOpenAlert(true);
-        setUserTicketOpen(ticket.user.name);
-        setQueueTicketOpen(ticket.queue.name);
-      } else {
-        setOpenAlert(false);
-        setUserTicketOpen("");
-        setQueueTicketOpen("");
-        setLoading(false);
-        onClose(ticket);
+      let data = JSON.parse(err.response.data.error)
+      if(data.message === "ERR_CONTACT_HAS_OPEN_TICKET"){
+        toast.error("O ticket já está atribuído ao usuário " + data.data.contactName);
       }
     }  
     setLoading(false);
+    
   };
 
   const handleSelectOption = (e, newValue) => {

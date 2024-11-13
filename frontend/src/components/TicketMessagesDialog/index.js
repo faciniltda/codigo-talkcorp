@@ -159,6 +159,7 @@ export default function TicketMessagesDialog({ open, handleClose, ticketId }) {
     }
   };
 
+
   const renderMessagesList = () => {
     return (
       <Box className={classes.root}>

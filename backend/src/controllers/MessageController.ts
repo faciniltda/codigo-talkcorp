@@ -70,6 +70,16 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   SetTicketMessagesAsRead(ticket);
 
+  if(req.user.profile === 'admin' && (Number(req.user.id) !== ticket.userId)) {
+    await ticket.update({
+      userId: req.user.id
+    });
+  
+    await ticket.reload();
+  }
+
+  
+
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File, index) => {
