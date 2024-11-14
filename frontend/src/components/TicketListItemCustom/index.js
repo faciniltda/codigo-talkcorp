@@ -109,7 +109,14 @@ const useStyles = makeStyles((theme) => ({
     justifySelf: "flex-end",
     textAlign: "right",
     position: "relative",
-    top: -21
+    top: -15
+  },
+
+  createdTicketTime: {
+    justifySelf: "flex-end",
+    textAlign: "right",
+    position: "relative",
+    top: -15
   },
 
   closedBadge: {
@@ -474,28 +481,34 @@ const useStyles = makeStyles((theme) => ({
         />
         <ListItemSecondaryAction>
           {ticket.lastMessage && (
-            <>
-
+            <Box display="flex" flexDirection="column" alignItems="flex-end">
               <Typography
                 className={classes.lastMessageTime}
                 component="span"
                 variant="body2"
                 color="textSecondary"
               >
-
                 {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
                   <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
                 ) : (
                   <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
                 )}
               </Typography>
-
-              <br />
-
-            </>
+              
+              {ticket.userId !== null && ticket.createdAt && (
+                <Typography
+                  className={classes.createdTicketTime}
+                  component="span"
+                  variant="body2"
+                  color="textSecondary"
+                >
+                  {"Criado em " + format(parseISO(ticket.createdAt), "dd/MM/yyyy")}
+                </Typography>
+              )}
+            </Box>
           )}
-
         </ListItemSecondaryAction>
+
         <span className={classes.secondaryContentSecond} >
           {ticket.status === "pending" && (
             <ButtonWithSpinner
