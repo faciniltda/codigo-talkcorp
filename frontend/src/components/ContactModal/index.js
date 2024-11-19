@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import InputMask from "react-input-mask"; // Importe a biblioteca
 
 import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
@@ -110,11 +111,17 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
 	const handleSaveContact = async values => {
 		try {
+			const formattedNumber = values.number.replace(/\D/g, "");
+			const formattedValues = {
+				...values,
+				number: formattedNumber,
+			};
+			console.log(formattedValues)
 			if (contactId) {
-				await api.put(`/contacts/${contactId}`, values);
+				await api.put(`/contacts/${contactId}`, formattedValues);
 				handleClose();
 			} else {
-				const { data } = await api.post("/contacts", values);
+				const { data } = await api.post("/contacts", formattedValues);
 				if (onSave) {
 					onSave(data);
 				}
@@ -162,16 +169,36 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 									margin="dense"
 									className={classes.textField}
 								/>
-								<Field
-									as={TextField}
-									label={i18n.t("contactModal.form.number")}
-									name="number"
-									error={touched.number && Boolean(errors.number)}
-									helperText={touched.number && errors.number}
-									placeholder="5541998608485"
-									variant="outlined"
-									margin="dense"
-								/>
+								<Field name="number">
+									{({ field, form }) => (
+										<TextField
+										{...field}
+										label="Número de Telefone"
+										variant="outlined"
+										margin="dense"
+										onChange={(e) => {
+											const value = e.target.value.replace(/\D/g, ""); 
+											let formattedValue = "";
+
+											if (value.length > 12) {
+												formattedValue = `+${value.slice(0, 2)} (${value.slice(2, 4)}) ${value.slice(4, 9)}-${value.slice(9, 13)}`;
+											} else if (value.length > 10) {
+												formattedValue = `+${value.slice(0, 2)} (${value.slice(2, 4)}) ${value.slice(4, 8)}-${value.slice(8, 12)}`;
+											} else if (value.length > 4) {
+												formattedValue = `+${value.slice(0, 2)} (${value.slice(2, 4)}) ${value.slice(4)}`;
+											} else if (value.length > 2) {
+												formattedValue = `+${value.slice(0, 2)} (${value.slice(2)}`;
+											} else {
+												formattedValue = `+${value}`;
+											}
+
+											form.setFieldValue("number", formattedValue); // Atualiza o valor formatado no Formik
+										}}
+										error={form.touched.number && Boolean(form.errors.number)}
+										helperText={form.touched.number && form.errors.number}
+										/>
+									)}
+								</Field>
 								<div>
 									<Field
 										as={TextField}
