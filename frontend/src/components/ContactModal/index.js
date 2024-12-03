@@ -129,6 +129,10 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			}
 			toast.success(i18n.t("contactModal.success"));
 		} catch (err) {
+			let data = JSON.parse(err.response.data.error)
+			if(data.message === "ERR_DUPLICATED_CONTACT"){
+				toast.error("Já existe um contato salvo com esse número");
+			}
 			toastError(err);
 		}
 	};
