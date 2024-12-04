@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createPaymentService } from "../services/PaymentService/CreatePaymentService";
+import { CreatePaymentService } from "../services/PaymentService/CreatePaymentService";
 
 export const createPayment = async (req: Request, res: Response) => {
   try {
@@ -9,7 +9,7 @@ export const createPayment = async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const paymentResult = await createPaymentService(paymentData);
+    const paymentResult = await CreatePaymentService(paymentData);
     return res.status(201).json(paymentResult);
   } catch (error) {
       return res.status(500).json({ error: error.message });

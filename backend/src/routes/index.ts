@@ -68,6 +68,6 @@ routes.use(promptRoutes);
 routes.use(queueIntegrationRoutes);
 routes.use(forgotsRoutes);
 routes.use(versionRouter);
-routes.use("/api", paymentRoutes);
+routes.use("/gateway", paymentRoutes);
 
 export default routes;
