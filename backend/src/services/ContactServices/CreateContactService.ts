@@ -28,7 +28,10 @@ const CreateContactService = async ({
   });
 
   if (numberExists) {
-    throw new AppError("ERR_DUPLICATED_CONTACT");
+    let error = {
+      message: "ERR_DUPLICATED_CONTACT",
+    }
+    throw new AppError(JSON.stringify(error), 400);
   }
 
   const contact = await Contact.create(
