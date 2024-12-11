@@ -7,22 +7,21 @@ const client = new MercadoPagoConfig({
 
 const payment = new Payment(client);
 
+
 export const CreatePaymentService = async (paymentData: any) => {
-    console.log(process.env.MERCADO_PAGO_ACCESS_TOKEN)
     try {
+        
         const body = {
-            transaction_amount: paymentData.amount,
-            description: paymentData.description,
-            payment_method_id: paymentData.paymentMethodId,
+            transaction_amount: paymentData.transaction_amount,
+            payment_method_id: paymentData.payment_method_id,
             payer: {
-                email: paymentData.email,
+                email: paymentData.payer.email,
             },
         };
-
+        
         const requestOptions = {
             idempotencyKey: paymentData.idempotencyKey || undefined,
         };
-
         const response = await payment.create({ body, requestOptions });
         return response;
     } catch (error) {
