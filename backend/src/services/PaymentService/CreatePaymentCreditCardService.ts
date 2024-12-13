@@ -8,16 +8,23 @@ const client = new MercadoPagoConfig({
 const payment = new Payment(client);
 
 
-export const CreatePaymentService = async (paymentData: any) => {
+export const CreatePaymentCreditCardService = async (paymentData: any) => {
     try {
-        
         const body = {
             transaction_amount: paymentData.transaction_amount,
+            token: paymentData.token,
+            description: '<DESCRIPTION>',
+            installments: paymentData.installments,
             payment_method_id: paymentData.payment_method_id,
+            issuer_id: paymentData.issuer_id,
             payer: {
                 email: paymentData.payer.email,
+                identification: {
+                number: paymentData.payer.identification.number,
+                type: paymentData.payer.identification.type,
+                },
             },
-        };
+            };
         
         const requestOptions = {
             idempotencyKey: paymentData.idempotencyKey || undefined,

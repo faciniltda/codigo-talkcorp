@@ -15,11 +15,10 @@ const CheckContactNumber = async (
   number: string,
   companyId: number
 ): Promise<IOnWhatsapp> => {
+  console.log("Checking contact number");
   const defaultWhatsapp = await GetDefaultWhatsApp(companyId);
-
   const wbot = getWbot(defaultWhatsapp.id);
   const isNumberExit = await checker(number, wbot);
-
   if (!isNumberExit.exists) {
     throw new Error("ERR_CHECK_NUMBER");
   }

@@ -21,14 +21,18 @@ const PaymentBrick = () => {
     paymentMethods: {
       bankTransfer: 'all',
       creditCard: 'all',
-      mercadoPago: 'all',
     },
   };
 
   const onSubmit = async ({ selectedPaymentMethod, formData }) => {
-    console.log('Formulário de pagamento:', formData);
+    
     try {
-      const { data } = await api.post('/gateway/createPayment', formData);
+      let newData = {
+        paymentMethod: selectedPaymentMethod,
+        ...formData,
+      }
+      console.log('Formulário de pagamento:', newData);
+      const { data } = await api.post('/gateway/createPayment', newData);
       console.log('Resposta do servidor:', data);
 
       // Define o paymentId retornado e exibe o StatusScreen
