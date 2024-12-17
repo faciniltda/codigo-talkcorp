@@ -133,6 +133,9 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			if(typeError === "ERR_DUPLICATED_CONTACT"){
 				toast.error("Já existe um contato salvo com esse número");
 			}
+			if(typeError === "ERR_CHECK_NUMBER"){
+				toast.error("Esse número de telefone não é válido");
+			}
 			toastError(err);
 		}
 	};
