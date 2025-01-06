@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "6.0.1",
+  "version": "6.0.0",
   "versionSystem": "6.0.0",
   "nomeEmpresa": "Atendechat",
   "private": true,
@@ -66,8 +66,8 @@
     "yup": "^0.32.8"
   },
   "scripts": {
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "builddev": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
