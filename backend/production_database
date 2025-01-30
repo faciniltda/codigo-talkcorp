@@ -1,0 +1,6 @@
+DB_DIALECT=postgres
+DB_HOST=168.121.168.52
+DB_PORT=5432
+DB_USER=talkcorp
+DB_PASS=Facini99
+DB_NAME=talkcorp
