@@ -69,6 +69,7 @@ export const getContact = async (
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
+
   const { companyId } = req.user;
   const newContact: ContactData = req.body;
   newContact.number = newContact.number.replace("-", "").replace(" ", "");
@@ -87,10 +88,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   }
 
   await CheckIsValidContact(newContact.number, companyId);
+
   const validNumber = await CheckContactNumber(newContact.number, companyId);
   const number = validNumber.jid.replace(/\D/g, "");
   newContact.number = number;
-
+  
   /**
    * Código desabilitado por demora no retorno
    */

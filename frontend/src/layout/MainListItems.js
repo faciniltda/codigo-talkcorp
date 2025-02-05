@@ -27,6 +27,7 @@ import ListIcon from "@material-ui/icons/ListAlt";
 import AnnouncementIcon from "@material-ui/icons/Announcement";
 import ForumIcon from "@material-ui/icons/Forum";
 import LocalAtmIcon from '@material-ui/icons/LocalAtm';
+import BookIcon from '@material-ui/icons/Book';
 import RotateRight from "@material-ui/icons/RotateRight";
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
@@ -45,6 +46,7 @@ import { AllInclusive, AttachFile, BlurCircular, DeviceHubOutlined, Schedule } f
 import usePlans from "../hooks/usePlans";
 import Typography from "@material-ui/core/Typography";
 import useVersion from "../hooks/useVersion";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   ListSubheader: {
@@ -142,12 +144,22 @@ const MainListItems = (props) => {
   const [showCampaigns, setShowCampaigns] = useState(false);
   const [showKanban, setShowKanban] = useState(false);
   const [showOpenAi, setShowOpenAi] = useState(false);
+  const [showTickets, setShowTickets] = useState(false);
   const [showIntegrations, setShowIntegrations] = useState(false); const history = useHistory();
   const [showSchedules, setShowSchedules] = useState(false);
+  const [showQuickMessage, setShowQuickMessage] = useState(false);
+  const [showToDoList, setShowToDoList] = useState(false);
+  const [showContacts, setShowContacts] = useState(false);
+  const [showTags, setShowTags] = useState(false);
+  const [showChats, setShowChats] = useState(false);
+  const [showHelps, setShowHelps] = useState(false);
+  const [showConnections, setShowConnections] = useState(false);
+  const [showFiles, setShowFiles] = useState(false);
+  const [showQueues, setShowQueues] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
   const [showInternalChat, setShowInternalChat] = useState(false);
   const [showExternalApi, setShowExternalApi] = useState(false);
-
-
+  const [showFinanceiro, setShowFinanceiro] = useState(false);
   const [invisible, setInvisible] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchParam] = useState("");
@@ -178,16 +190,41 @@ const MainListItems = (props) => {
 
   useEffect(() => {
     async function fetchData() {
-      const companyId = user.companyId;
-      const planConfigs = await getPlanCompany(undefined, companyId);
+      const { data } = await api.get("/companies/"+user.id);
+      const dueDate = data.dueDate;
 
-      setShowCampaigns(planConfigs.plan.useCampaigns);
-      setShowKanban(planConfigs.plan.useKanban);
-      setShowOpenAi(planConfigs.plan.useOpenAi);
-      setShowIntegrations(planConfigs.plan.useIntegrations);
-      setShowSchedules(planConfigs.plan.useSchedules);
-      setShowInternalChat(planConfigs.plan.useInternalChat);
-      setShowExternalApi(planConfigs.plan.useExternalApi);
+      const hoje = moment(moment()).format("DD/MM/yyyy");
+      const vencimento = moment(dueDate).format("DD/MM/yyyy");
+
+      var diff = moment(dueDate).diff(moment(moment()).format());
+
+      var before = moment(moment().format()).isBefore(dueDate);
+      console.log("before", dueDate)
+      var dias = moment.duration(diff).asDays();
+      if (before === true) {
+        const companyId = user.companyId;
+        const planConfigs = await getPlanCompany(undefined, companyId);
+
+        setShowCampaigns(planConfigs.plan.useCampaigns);
+        setShowKanban(planConfigs.plan.useKanban);
+        setShowOpenAi(planConfigs.plan.useOpenAi);
+        setShowIntegrations(planConfigs.plan.useIntegrations);
+        setShowSchedules(planConfigs.plan.useSchedules);
+        setShowInternalChat(planConfigs.plan.useInternalChat);
+        setShowExternalApi(planConfigs.plan.useExternalApi);
+        setShowTickets(true);
+        setShowQuickMessage(true);
+        setShowToDoList(true);
+        setShowContacts(true);
+        setShowTags(true);
+        setShowChats(true);
+        setShowHelps(true);
+        setShowConnections(true);
+        setShowFiles(true);
+        setShowQueues(true);
+        setShowUsers(true);
+        setShowFinanceiro(true);
+      }
     }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -296,11 +333,11 @@ const MainListItems = (props) => {
         )}
       />
 
-      <ListItemLink
+      {showTickets && (<ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
         icon={<WhatsAppIcon />}
-      />
+      />)}
 	  
 	{showKanban && (  
 	  <ListItemLink
@@ -311,37 +348,37 @@ const MainListItems = (props) => {
 	  )}
 
 
-      <ListItemLink
+    {showQuickMessage && (<ListItemLink
         to="/quick-messages"
         primary={i18n.t("mainDrawer.listItems.quickMessages")}
         icon={<FlashOnIcon />}
-      />
+      />)}
 	  
-	  <ListItemLink
+	  {showToDoList && (<ListItemLink
         to="/todolist"
         primary={i18n.t("Tarefas")}
         icon={<BorderColorIcon />}
-      />
+      />)}
 
-      <ListItemLink
+      {showContacts && (<ListItemLink
         to="/contacts"
         primary={i18n.t("mainDrawer.listItems.contacts")}
         icon={<ContactPhoneOutlinedIcon />}
-      />
+      />)}
 
-      <ListItemLink
+      {showSchedules && (<ListItemLink
         to="/schedules"
         primary={i18n.t("mainDrawer.listItems.schedules")}
         icon={<EventIcon />}
-      />
+      />)}
 
-      <ListItemLink
+      {showTags && (<ListItemLink
         to="/tags"
         primary={i18n.t("mainDrawer.listItems.tags")}
         icon={<LocalOfferIcon />}
-      />
+      />)}
 
-      <ListItemLink
+        {showChats && (<ListItemLink
         to="/chats"
         primary={i18n.t("mainDrawer.listItems.chats")}
         icon={
@@ -349,13 +386,13 @@ const MainListItems = (props) => {
             <ForumIcon />
           </Badge>
         }
-      />
+      />)}
 
-      <ListItemLink
+        {showHelps && (<ListItemLink
         to="/helps"
         primary={i18n.t("mainDrawer.listItems.helps")}
         icon={<HelpOutlineIcon />}
-      />
+      />)}
 
       <Can
         role={user.profile}
@@ -451,7 +488,7 @@ const MainListItems = (props) => {
                 icon={<DeviceHubOutlined />}
               />
             )}
-            <ListItemLink
+            {showConnections && (<ListItemLink
               to="/connections"
               primary={i18n.t("mainDrawer.listItems.connections")}
               icon={
@@ -459,22 +496,22 @@ const MainListItems = (props) => {
                   <SyncAltIcon />
                 </Badge>
               }
-            />
-            <ListItemLink
+            />)}
+            {showFiles && (<ListItemLink
               to="/files"
               primary={i18n.t("mainDrawer.listItems.files")}
               icon={<AttachFile />}
-            />
-            <ListItemLink
+            />)}
+            {showQueues && (<ListItemLink
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<AccountTreeOutlinedIcon />}
-            />
-            <ListItemLink
+            />)}
+            {showUsers && (<ListItemLink
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}
               icon={<PeopleAltOutlinedIcon />}
-            />
+            />)}
             {showExternalApi && (
               <>
                 <ListItemLink
@@ -484,11 +521,19 @@ const MainListItems = (props) => {
                 />
               </>
             )}
-            <ListItemLink
+            {showFinanceiro && (<ListItemLink
               to="/financeiro"
               primary={i18n.t("mainDrawer.listItems.financeiro")}
               icon={<LocalAtmIcon />}
+            />)}
+
+            <ListItemLink
+              to="/plans"
+              primary="Planos"
+              icon={<BookIcon />}
             />
+
+            
 
             <ListItemLink
               to="/settings"
@@ -496,6 +541,7 @@ const MainListItems = (props) => {
               icon={<SettingsOutlinedIcon />}
             />
 			
+              
 			
             {!collapsed && <React.Fragment>
               <Divider />

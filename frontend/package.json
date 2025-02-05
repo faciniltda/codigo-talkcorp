@@ -12,6 +12,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@material-ui/pickers": "^3.3.10",
     "@material-ui/styles": "^4.11.5",
+    "@mercadopago/sdk-react": "^0.0.19",
     "@mui/material": "^5.10.13",
     "@mui/x-date-pickers": "^6.0.1",
     "@testing-library/jest-dom": "^5.11.4",
@@ -67,8 +68,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-linux":  "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false react-scripts build",
     "builddev": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
