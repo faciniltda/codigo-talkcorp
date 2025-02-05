@@ -4,25 +4,63 @@ import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 import StatusScreenModal from '../../components/StatusScreenModal'; // Importa o StatusScreen
 import api from '../../services/api';
 
-initMercadoPago('TEST-63e21d49-306e-491f-9a48-d7956cbf1d7a', {
+import moment from 'moment';
+
+initMercadoPago('APP_USR-5d15fcb1-9d43-46cb-8876-14d6c190b80b', {
   locale: 'pt-BR',
 });
 
 const PaymentBrick = () => {
   const [paymentId, setPaymentId] = useState(null); // Estado para armazenar o paymentId
   const [showStatus, setShowStatus] = useState(false); // Controle para exibir o StatusScreen
+  const [company, setCompany] = useState({});
+  //const {plan} = useLocation().location.state || {};
 
   const initialization = {
-    amount: 100,
+    amount: JSON.parse(localStorage.getItem('choosedPlan')).value,
     preferenceId:'608654313-2f87af02-c7ee-4f58-af8a-2772e5a02c28',
   };
 
   const customization = {
     paymentMethods: {
-      bankTransfer: 'all',
       creditCard: 'all',
+      bankTransfer: 'all',
     },
   };
+
+  const getCompany = async () => {
+    let companyId = localStorage.getItem('companyId');
+    const { data } = await api.get("/companies/"+JSON.parse(companyId));
+    console.log('Empresa:', data);
+    setCompany(data);
+    return data;
+  }
+
+  const updateDueDate = async () => {
+    try {
+      let companyData = await getCompany();
+      let updatedCompany = {};
+
+      if(companyData.recurrence === 'MENSAL'){
+        let newDueDate = moment().add(30, 'days').toISOString();
+        updatedCompany = {
+          ...company,
+          dueDate: newDueDate,
+        };
+      }else if(companyData.recurrence === 'ANUAL'){
+        let newDueDate = moment().add(365, 'days').toISOString();
+        updatedCompany = {
+          ...company,
+          dueDate: newDueDate,
+        };
+      }
+      const { data } = await api.put("/companies/" + companyData.id, updatedCompany);
+      setCompany(data.company);
+      console.log('Data de vencimento atualizada:', data);
+    } catch (error) {
+      console.error('Erro ao atualizar a data de vencimento:', error);
+    }
+  }
 
   const onSubmit = async ({ selectedPaymentMethod, formData }) => {
     
@@ -35,10 +73,14 @@ const PaymentBrick = () => {
       const { data } = await api.post('/gateway/createPayment', newData);
       console.log('Resposta do servidor:', data);
 
-      // Define o paymentId retornado e exibe o StatusScreen
-      if (data?.id) {
-        setPaymentId(data.id); // Atualiza o estado com o paymentId
-        setShowStatus(true); // Mostra o StatusScreen
+      if (data && data.status && data.status === 'approved') {
+        setPaymentId(data.id);
+        setShowStatus(true);
+        await updateDueDate();
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     } catch (err) {
       console.error('Erro ao processar pagamento:', err);

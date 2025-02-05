@@ -9,6 +9,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { SocketContext } from "../../context/Socket/SocketContext";
 import moment from "moment";
+
 const useAuth = () => {
   const history = useHistory();
   const [isAuth, setIsAuth] = useState(false);
@@ -136,8 +137,18 @@ const useAuth = () => {
         history.push("/tickets");
         setLoading(false);
       } else {
-        toastError(`Opss! Sua assinatura venceu ${vencimento}.
-Entre em contato com o Suporte para mais informações! `);
+        localStorage.setItem("token", JSON.stringify(data.token));
+        localStorage.setItem("companyId", companyId);
+        localStorage.setItem("userId", id);
+        localStorage.setItem("companyDueDate", vencimento);
+        api.defaults.headers.Authorization = `Bearer ${data.token}`;
+        setUser(data.user);
+        if (Math.round(dias) < 5) {
+          toast.warn(`Sua assinatura venceu há ${Math.abs(Math.round(dias))} ${Math.round(dias) === 1 ? 'dia' : 'dias'} `);
+        }
+        history.push("/tickets");
+        // toastError(`Opss! Sua assinatura venceu ${vencimento}.
+        //             Entre em contato com o Suporte para mais informações! `);
         setLoading(false);
       }
 

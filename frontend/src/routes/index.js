@@ -38,6 +38,7 @@ import Prompts from "../pages/Prompts";
 import QueueIntegration from "../pages/QueueIntegration";
 import ForgetPassword from "../pages/ForgetPassWord/"; // Reset PassWd
 import PaymentBrick from "../pages/PaymentAPI";
+import Plans from "../pages/Plans";
 
 const Routes = () => {
   const [showCampaigns, setShowCampaigns] = useState(false);
@@ -140,6 +141,12 @@ const Routes = () => {
                   exact
                   path="/paymentBrick"
                   component={PaymentBrick}
+                  isPrivate
+                />
+                <Route
+                  exact
+                  path="/plans"
+                  component={Plans}
                   isPrivate
                 />
                 <Route exact path="/chats/:id?" component={Chat} isPrivate />
