@@ -23,8 +23,7 @@ const PaymentBrick = () => {
 
   const customization = {
     paymentMethods: {
-      creditCard: 'all',
-      bankTransfer: 'all',
+      creditCard: 'all'
     },
   };
 
