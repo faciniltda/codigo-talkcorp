@@ -104,13 +104,13 @@ const App = () => {
 
     return (
         <ColorModeContext.Provider value={{ colorMode }}>
-            <ThemeProvider theme={theme}>
+             <ThemeProvider theme={theme}>
                 <QueryClientProvider client={queryClient}>
                   <SocketContext.Provider value={SocketManager}>
                       <Routes />
                   </SocketContext.Provider>
                 </QueryClientProvider>
-            </ThemeProvider>
+            </ThemeProvider> 
         </ColorModeContext.Provider>
     );
 };

@@ -8,6 +8,7 @@ import moment from 'moment';
 
 initMercadoPago('APP_USR-5d15fcb1-9d43-46cb-8876-14d6c190b80b', {
   locale: 'pt-BR',
+  
 });
 
 const PaymentBrick = () => {

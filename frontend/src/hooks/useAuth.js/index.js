@@ -63,11 +63,14 @@ const useAuth = () => {
     (async () => {
       if (token) {
         try {
+
           const { data } = await api.post("/auth/refresh_token");
           api.defaults.headers.Authorization = `Bearer ${data.token}`;
           setIsAuth(true);
+          console.log("dataUser",data.user)
           setUser(data.user);
         } catch (err) {
+          setIsAuth(false);
           toastError(err);
         }
       }
@@ -114,47 +117,51 @@ const useAuth = () => {
 
       moment.locale('pt-br');
       const dueDate = data.user.company.dueDate;
-      const hoje = moment(moment()).format("DD/MM/yyyy");
       const vencimento = moment(dueDate).format("DD/MM/yyyy");
 
       var diff = moment(dueDate).diff(moment(moment()).format());
 
       var before = moment(moment().format()).isBefore(dueDate);
       var dias = moment.duration(diff).asDays();
-
-      if (before === true) {
+      
+      localStorage.setItem("isExpired", !before);
+      
+      if (before === true) {  
+          setIsAuth(true);  
           localStorage.setItem("token", JSON.stringify(data.token));
-          localStorage.setItem("companyId", companyId);
-          localStorage.setItem("userId", id);
-          localStorage.setItem("companyDueDate", vencimento);
+      localStorage.setItem("companyId", companyId);
+      localStorage.setItem("userId", id);
           api.defaults.headers.Authorization = `Bearer ${data.token}`;
           setUser(data.user);
-          setIsAuth(true);
-          toast.success(i18n.t("auth.toasts.success"));
+          
+          toast.success(i18n.t("auth.toasts.success"));      
           if (Math.round(dias) < 5) {
             toast.warn(`Sua assinatura vence em ${Math.round(dias)} ${Math.round(dias) === 1 ? 'dia' : 'dias'} `);
           }
           history.push("/tickets");
-          setLoading(false);
-      } else if(data.user.profile==='admin'){
+          
+      } else{
+          if(data.user.profile !== "admin"){
+             toast.error(`Opss! Sua assinatura venceu dia ${vencimento}.
+                      Entre em contato com o Suporte para mais informações! `)
+                      setLoading(false);
+                      return
+          } 
           localStorage.setItem("token", JSON.stringify(data.token));
           localStorage.setItem("companyId", companyId);
           localStorage.setItem("userId", id);
-          localStorage.setItem("companyDueDate", vencimento);
+          console.log("entrou")
+          setIsAuth(true);  
           api.defaults.headers.Authorization = `Bearer ${data.token}`;
           setUser(data.user);
-          setIsAuth(true);
-          if (Math.round(dias) < 5) {
-            toast.warn(`Sua assinatura venceu há ${Math.abs(Math.round(dias))} ${Math.round(dias) === 1 ? 'dia' : 'dias'} `);
-          }
-          history.push("/tickets");
-          setLoading(false);
-      }else{
-        toast.warn(`Opss! Sua assinatura venceu dia ${vencimento}.
-                    Entre em contato com o Suporte para mais informações! `);
-        setLoading(false);
+          
+          toast.success(i18n.t("auth.toasts.success"));   
+          history.push("/plans");
+          toast.warn(`Opss! Sua assinatura venceu dia ${vencimento}.
+                      Faça o pagamento para liberar os acessos`);
+        
       }
-
+      setLoading(false);
       //quebra linha 
     } catch (err) {
       toastError(err);
@@ -173,6 +180,7 @@ const useAuth = () => {
       localStorage.removeItem("companyId");
       localStorage.removeItem("userId");
       localStorage.removeItem("cshow");
+      localStorage.removeItem("isExpired");
       api.defaults.headers.Authorization = undefined;
       setLoading(false);
       history.push("/login");

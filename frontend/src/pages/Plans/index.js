@@ -52,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
 const Plans = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUserPlan, setCurrentUserPlan] = useState(null);
@@ -60,9 +59,6 @@ const Plans = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: plansData } = await api.get("/plans");
-        setPlans(plansData.plans);
-
         const { data: userData } = await api.get("/companies/listPlan/" + localStorage.getItem('companyId'));
         setCurrentUserPlan(userData.plan);
       } catch (err) {
@@ -99,7 +95,7 @@ const Plans = () => {
     return ['users', 'queues', 'connections'].includes(key);
   };
 
-  const userPlan = plans.find((plan) => currentUserPlan && plan.id === currentUserPlan.id);
+
 
   return (
     <Container component="main" maxWidth="lg"> {/* Aumentei o maxWidth para "lg" */}
@@ -109,7 +105,7 @@ const Plans = () => {
           Plano Atual
         </Typography>
         <Grid container spacing={3} justifyContent="center">
-          {userPlan ? (
+          {currentUserPlan ? (
             <Grid item xs={12} md={8}> {/* Ajustei o número de colunas ocupadas */}
               <Card className={classes.card}>
                 <CardContent>
@@ -118,13 +114,13 @@ const Plans = () => {
                     color="textSecondary"
                     gutterBottom
                   >
-                    {userPlan.name}
+                    {currentUserPlan.name}
                   </Typography>
                   <Typography variant="h5" component="h2">
-                    {userPlan.description}
+                    {currentUserPlan.description}
                   </Typography>
                   <Typography className={classes.price}>
-                    R$ {userPlan.value}
+                    R$ {currentUserPlan.value}
                   </Typography>
                   <TableContainer component={Paper} className={classes.table}>
                     <Table size="small">
@@ -142,9 +138,9 @@ const Plans = () => {
                             </TableCell>
                             <TableCell align="center">
                               {isNumericFeature(feature.key) ? (
-                                userPlan[feature.key] || 0
+                                currentUserPlan[feature.key] || 0
                               ) : (
-                                userPlan[feature.key] ? <Check style={{ color: 'green' }} /> : <Close style={{ color: 'red' }} />
+                                currentUserPlan[feature.key] ? <Check style={{ color: 'green' }} /> : <Close style={{ color: 'red' }} />
                               )}
                             </TableCell>
                           </TableRow>
@@ -160,7 +156,7 @@ const Plans = () => {
                     variant="contained"
                     fullWidth
                     onClick={() => {
-                      handleSelectPlan(userPlan);
+                      handleSelectPlan(currentUserPlan);
                     }}
                   >
                     Renovar Plano Atual
