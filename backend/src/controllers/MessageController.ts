@@ -16,6 +16,7 @@ import UpdateTicketService from "../services/TicketServices/UpdateTicketService"
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import EditWhatsAppMessage from "../services/WbotServices/EditWhatsAppMessage";
 import CheckContactNumber from "../services/WbotServices/CheckNumber";
 import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
@@ -29,6 +30,7 @@ type MessageData = {
   fromMe: boolean;
   read: boolean;
   quotedMsg?: Message;
+  editedMsg?: Message;
   number?: string;
   closeTicket?: true;
 };
@@ -62,7 +64,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { body, quotedMsg }: MessageData = req.body;
+  const { body, quotedMsg, editedMsg }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
   const { companyId } = req.user;
 
@@ -86,12 +88,28 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         await SendWhatsAppMedia({ media, ticket, body: Array.isArray(body) ? body[index] : body });
       })
     );
-  } else {
+  }else{
     const send = await SendWhatsAppMessage({ body, ticket, quotedMsg });
   }
 
   return res.send();
 };
+
+export const edit = async (req: Request, res: Response): Promise<Response> => {
+  const { messageId } = req.params;
+  const { companyId } = req.user;
+  const { body, editedMsg }: MessageData = req.body;
+
+  const message = await EditWhatsAppMessage({ body, messageId });
+  const io = getIO();
+  io.to(message.ticketId.toString()).emit(`company-${companyId}-appMessage`, {
+    action: "update",
+    message
+  });
+  return res.send();
+};
+
+
 
 export const remove = async (
   req: Request,
