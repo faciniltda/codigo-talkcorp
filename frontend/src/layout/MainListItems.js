@@ -47,6 +47,7 @@ import usePlans from "../hooks/usePlans";
 import Typography from "@material-ui/core/Typography";
 import useVersion from "../hooks/useVersion";
 import moment from "moment";
+import { is } from "date-fns/locale";
 
 const useStyles = makeStyles((theme) => ({
   ListSubheader: {
@@ -161,6 +162,7 @@ const MainListItems = (props) => {
   const [showExternalApi, setShowExternalApi] = useState(false);
   const [showFinanceiro, setShowFinanceiro] = useState(false);
   const [invisible, setInvisible] = useState(true);
+  const [expired, setExpired] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchParam] = useState("");
   const [chats, dispatch] = useReducer(reducer, []);
@@ -190,41 +192,17 @@ const MainListItems = (props) => {
 
   useEffect(() => {
     async function fetchData() {
-      const { data } = await api.get("/companies/"+user.id);
-      const dueDate = data.dueDate;
+      const companyId = user.companyId;
+      const planConfigs = await getPlanCompany(undefined, companyId);
 
-      const hoje = moment(moment()).format("DD/MM/yyyy");
-      const vencimento = moment(dueDate).format("DD/MM/yyyy");
+      setShowCampaigns(planConfigs.plan.useCampaigns);
+      setShowKanban(planConfigs.plan.useKanban);
+      setShowOpenAi(planConfigs.plan.useOpenAi);
+      setShowIntegrations(planConfigs.plan.useIntegrations);
+      setShowSchedules(planConfigs.plan.useSchedules);
+      setShowInternalChat(planConfigs.plan.useInternalChat);
+      setShowExternalApi(planConfigs.plan.useExternalApi);
 
-      var diff = moment(dueDate).diff(moment(moment()).format());
-
-      var before = moment(moment().format()).isBefore(dueDate);
-      console.log("before", dueDate)
-      var dias = moment.duration(diff).asDays();
-      if (before === true) {
-        const companyId = user.companyId;
-        const planConfigs = await getPlanCompany(undefined, companyId);
-
-        setShowCampaigns(planConfigs.plan.useCampaigns);
-        setShowKanban(planConfigs.plan.useKanban);
-        setShowOpenAi(planConfigs.plan.useOpenAi);
-        setShowIntegrations(planConfigs.plan.useIntegrations);
-        setShowSchedules(planConfigs.plan.useSchedules);
-        setShowInternalChat(planConfigs.plan.useInternalChat);
-        setShowExternalApi(planConfigs.plan.useExternalApi);
-        setShowTickets(true);
-        setShowQuickMessage(true);
-        setShowToDoList(true);
-        setShowContacts(true);
-        setShowTags(true);
-        setShowChats(true);
-        setShowHelps(true);
-        setShowConnections(true);
-        setShowFiles(true);
-        setShowQueues(true);
-        setShowUsers(true);
-        setShowFinanceiro(true);
-      }
     }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -276,7 +254,21 @@ const MainListItems = (props) => {
   }, [chats, user.id]);
 
   useEffect(() => {
-    if (localStorage.getItem("cshow")) {
+    const verifyDueDate = async () => {
+      try {
+        let companyId = localStorage.getItem('companyId');
+        const { data } = await api.get("/companies/"+JSON.parse(companyId));
+  
+        const dueDate = data.dueDate;
+        var before = moment(moment().format()).isBefore(dueDate);
+        return before;
+      } catch (error) {
+        console.error('Erro ao verificar a data de vencimento:', error);
+      }
+    }
+    const isExpired = verifyDueDate();
+    setExpired(isExpired);
+    if (localStorage.getItem("cshow") && !isExpired) {
       setShowCampaigns(true);
     }
   }, []);
@@ -319,9 +311,14 @@ const MainListItems = (props) => {
     handleLogout();
   };
 
+
+
   return (
     <div onClick={drawerClose}>
-      <Can
+      {!expired ?
+       (
+        <>
+        <Can
         role={user.profile}
         perform="dashboard:view"
         yes={() => (
@@ -333,38 +330,37 @@ const MainListItems = (props) => {
         )}
       />
 
-      {showTickets && (<ListItemLink
+      <ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
         icon={<WhatsAppIcon />}
-      />)}
+      />
 	  
-	{showKanban && (  
+	
 	  <ListItemLink
         to="/kanban"
         primary={i18n.t("Kanban")}
         icon={<TableChartIcon />}
       />
-	  )}
 
 
-    {showQuickMessage && (<ListItemLink
+    <ListItemLink
         to="/quick-messages"
         primary={i18n.t("mainDrawer.listItems.quickMessages")}
         icon={<FlashOnIcon />}
-      />)}
+      />
 	  
-	  {showToDoList && (<ListItemLink
+	  <ListItemLink
         to="/todolist"
         primary={i18n.t("Tarefas")}
         icon={<BorderColorIcon />}
-      />)}
+      />
 
-      {showContacts && (<ListItemLink
+      <ListItemLink
         to="/contacts"
         primary={i18n.t("mainDrawer.listItems.contacts")}
         icon={<ContactPhoneOutlinedIcon />}
-      />)}
+      />
 
       {showSchedules && (<ListItemLink
         to="/schedules"
@@ -372,13 +368,13 @@ const MainListItems = (props) => {
         icon={<EventIcon />}
       />)}
 
-      {showTags && (<ListItemLink
+      <ListItemLink
         to="/tags"
         primary={i18n.t("mainDrawer.listItems.tags")}
         icon={<LocalOfferIcon />}
-      />)}
+      />
 
-        {showChats && (<ListItemLink
+        <ListItemLink
         to="/chats"
         primary={i18n.t("mainDrawer.listItems.chats")}
         icon={
@@ -386,13 +382,13 @@ const MainListItems = (props) => {
             <ForumIcon />
           </Badge>
         }
-      />)}
+      />
 
-        {showHelps && (<ListItemLink
+      <ListItemLink
         to="/helps"
         primary={i18n.t("mainDrawer.listItems.helps")}
         icon={<HelpOutlineIcon />}
-      />)}
+      />
 
       <Can
         role={user.profile}
@@ -488,7 +484,7 @@ const MainListItems = (props) => {
                 icon={<DeviceHubOutlined />}
               />
             )}
-            {showConnections && (<ListItemLink
+            <ListItemLink
               to="/connections"
               primary={i18n.t("mainDrawer.listItems.connections")}
               icon={
@@ -496,22 +492,22 @@ const MainListItems = (props) => {
                   <SyncAltIcon />
                 </Badge>
               }
-            />)}
-            {showFiles && (<ListItemLink
+            />
+            <ListItemLink
               to="/files"
               primary={i18n.t("mainDrawer.listItems.files")}
               icon={<AttachFile />}
-            />)}
-            {showQueues && (<ListItemLink
+            />
+            <ListItemLink
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<AccountTreeOutlinedIcon />}
-            />)}
-            {showUsers && (<ListItemLink
+            />
+            <ListItemLink
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}
               icon={<PeopleAltOutlinedIcon />}
-            />)}
+            />
             {showExternalApi && (
               <>
                 <ListItemLink
@@ -521,11 +517,11 @@ const MainListItems = (props) => {
                 />
               </>
             )}
-            {showFinanceiro && (<ListItemLink
+            <ListItemLink
               to="/financeiro"
               primary={i18n.t("mainDrawer.listItems.financeiro")}
               icon={<LocalAtmIcon />}
-            />)}
+            />
 
             <ListItemLink
               to="/plans"
@@ -561,6 +557,17 @@ const MainListItems = (props) => {
           </>
         )}
       />
+      </>
+      )
+      :
+      (
+        <ListItemLink
+              to="/plans"
+              primary="Planos"
+              icon={<BookIcon />}
+        />
+      )
+    }
     </div>
   );
 };
