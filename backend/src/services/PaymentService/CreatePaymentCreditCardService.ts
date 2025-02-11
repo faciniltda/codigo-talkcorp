@@ -13,7 +13,7 @@ export const CreatePaymentCreditCardService = async (paymentData: any) => {
         const body = {
             transaction_amount: paymentData.transaction_amount,
             token: paymentData.token,
-            description: '<DESCRIPTION>',
+            description: 'Renovação do plano da TalkCorp',
             installments: paymentData.installments,
             payment_method_id: paymentData.payment_method_id,
             issuer_id: paymentData.issuer_id,

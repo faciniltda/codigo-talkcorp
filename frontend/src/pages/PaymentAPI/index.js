@@ -1,8 +1,10 @@
 // PaymentPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 import StatusScreenModal from '../../components/StatusScreenModal'; // Importa o StatusScreen
 import api from '../../services/api';
+import { toast } from "react-toastify";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 import moment from 'moment';
 
@@ -12,9 +14,11 @@ initMercadoPago('APP_USR-5d15fcb1-9d43-46cb-8876-14d6c190b80b', {
 });
 
 const PaymentBrick = () => {
+
   const [paymentId, setPaymentId] = useState(null); // Estado para armazenar o paymentId
   const [showStatus, setShowStatus] = useState(false); // Controle para exibir o StatusScreen
   const [company, setCompany] = useState({});
+  const { handleLogout, loading } = useContext(AuthContext);
   //const {plan} = useLocation().location.state || {};
 
   const initialization = {
@@ -40,7 +44,7 @@ const PaymentBrick = () => {
     try {
       let companyData = await getCompany();
       let updatedCompany = {};
-
+      console.log('companyData:', companyData);
       if(companyData.recurrence === 'MENSAL'){
         let newDueDate = moment().add(30, 'days').toISOString();
         updatedCompany = {
@@ -79,8 +83,11 @@ const PaymentBrick = () => {
         await updateDueDate();
 
         setTimeout(() => {
-          window.location.reload();
+          handleLogout();
         }, 3000);
+      }
+      else if(data && data.status && data.status === 'rejected'){
+        toast.error('Seu pagamento rejeitado');
       }
     } catch (err) {
       console.error('Erro ao processar pagamento:', err);
