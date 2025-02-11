@@ -48,6 +48,10 @@ const App = () => {
                 "&::-webkit-scrollbar-thumb": {
                     backgroundColor: mode === "light" ? "#F3F3F3" : "#333333",
                 },
+            },typography: {
+                fontFamily: [
+                    'Poppins',
+                ].join(','),
             },
             palette: {
                 type: mode,
