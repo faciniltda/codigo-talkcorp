@@ -42,14 +42,16 @@ import Plans from "../pages/Plans";
 
 const Routes = () => {
   const [showCampaigns, setShowCampaigns] = useState(false);
-
-  useEffect(() => {
-    const cshow = localStorage.getItem("cshow");
-    if (cshow !== undefined) {
-      setShowCampaigns(true);
-    }
-  }, []);
-
+   const [expired, setExpired] = useState(false);
+    useEffect(() => {
+      const isExpired = localStorage.getItem("isExpired") === "true" ;
+      
+      setExpired(isExpired);
+      if (localStorage.getItem("cshow") && !isExpired) {
+        setShowCampaigns(true);
+      }
+    }, []);
+  
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -61,7 +63,7 @@ const Routes = () => {
             {/* <Route exact path="/create-company" component={Companies} /> */}
             <WhatsAppsProvider>
               <LoggedInLayout>
-                {localStorage.getItem("isExpired") === "false" ? (
+                {!expired ? (
                   <>
                     <Route exact path="/" component={Dashboard} isPrivate />
                     <Route exact path="/tickets/:ticketId?" component={TicketResponsiveContainer} isPrivate />
