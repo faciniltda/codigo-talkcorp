@@ -54,7 +54,7 @@ const TransferTicketModalCustom = ({ modalOpen, onClose, ticketid }) => {
 
   useEffect(() => {
     return () => {
-      isMounted.current = false;
+      isMounted.current = true;
     };
   }, []);
 
@@ -168,12 +168,6 @@ const TransferTicketModalCustom = ({ modalOpen, onClose, ticketid }) => {
             getOptionLabel={(option) => `${option.name}`}
             onChange={(e, newValue) => {
               setSelectedUser(newValue);
-              if (newValue != null && Array.isArray(newValue.queues)) {
-                setQueues(newValue.queues);
-              } else {
-                setQueues(allQueues);
-                setSelectedQueue("");
-              }
             }}
             options={options}
             filterOptions={filterOptions}
