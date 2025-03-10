@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     overflow: "hidden",
     [theme.breakpoints.down("sm")]: {
-      height: "70%", // O carrossel ocupa 50% da tela
+      height: "70%",
     },
   },
   loginContainer: {
@@ -130,10 +130,19 @@ const Login = () => {
               {i18n.t("login.buttons.submit")}
             </Button>
             <Grid container>
-              <Grid item>
-                <Link href="#" variant="body2" component={RouterLink} to="/signup">
-                  {i18n.t("login.buttons.register")}
-                </Link>
+              <Grid item xs={12}>
+                <Grid container direction="column" alignItems="center" spacing={1}>
+                  <Grid item>
+                    <Link href="#" variant="body2" component={RouterLink} to="/signup">
+                      {i18n.t("login.buttons.register")}
+                    </Link>
+                  </Grid>
+                  <Grid item>
+                    <Link href="#" variant="body2" component={RouterLink} to="/forgetpsw">
+                      Esqueci minha senha
+                    </Link>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </form>

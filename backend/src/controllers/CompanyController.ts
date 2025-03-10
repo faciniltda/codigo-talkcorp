@@ -97,7 +97,7 @@ export const update = async (
   const companyData: CompanyData = req.body;
 
   const schema = Yup.object().shape({
-    name: Yup.string()
+    name: Yup.string()  
   });
 
   try {

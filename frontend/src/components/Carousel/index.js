@@ -10,7 +10,6 @@ const images = importAll(require.context("../../assets/advertise", false, /\.(pn
 const useStyles = makeStyles((theme) => ({
   carouselContainer: {
     width: "100%",
-    maxWidth: "500px",
     margin: "0 auto",
     [theme.breakpoints.down("sm")]: {
       maxWidth: "100%",
@@ -18,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
   },
   image: {
     width: "100%",
-    height: "500px",
     objectFit: "cover",
     [theme.breakpoints.down("sm")]: {
       height: "250px",
