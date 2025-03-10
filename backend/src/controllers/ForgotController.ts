@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import SendMail from "../services/ForgotPassWordServices/SendMail";
 import ResetPassword from "../services/ResetPasswordService/ResetPassword";
 type IndexQuery = { email?: string; token?: string; password?: string };
+
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email } = req.params as IndexQuery;
   const TokenSenha = uuid();

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100vw",
     height: "100vh",
-    background: "black", //Cor de fundo
+    backgroundColor: theme.palette.primary.main,
     backgroundRepeat: "no-repeat",
     backgroundSize: "100% 100%",
     backgroundPosition: "center",
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "55px 30px",
+    padding: "20px 30px 55px 30px",
     borderRadius: "12.5px",
   },
   avatar: {
@@ -61,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
   },
   powered: {
     color: "white",
+  },
+  text: {
+    marginBottom: theme.spacing(2), // Adiciona espaçamento abaixo do texto
   },
 }));
 
@@ -174,8 +177,8 @@ const handleSendEmail = async (values) => {
               alt="Whats"
             />
           </div>
-          <Typography component="h1" variant="h5">
-            {i18n.t("Redefinir senha")}
+          <Typography className={classes.text}>
+            {showAdditionalFields ? "Digite a nova senha e o código de verificação" : "Digite o email cadastrado para redefinir a senha"}
           </Typography>
           <Formik
             initialValues={{
@@ -201,7 +204,7 @@ const handleSendEmail = async (values) => {
             {({ touched, errors, isSubmitting }) => (
               <Form className={classes.form}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                {!showAdditionalFields && ( <Grid item xs={12}>
                     <Field
                       as={TextField}
                       variant="outlined"
@@ -215,6 +218,7 @@ const handleSendEmail = async (values) => {
                       required
                     />
                   </Grid>
+                  )}
                   {showAdditionalFields && (
                     <>
                       <Grid item xs={12}>

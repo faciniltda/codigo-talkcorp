@@ -1,6 +1,7 @@
 import sequelize from "sequelize";
 import database from "../../database";
 import { hash } from "bcryptjs";
+
 const ResetPassword = async (
   email: string,
   token: string,
