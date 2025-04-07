@@ -11,6 +11,9 @@ import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 import SimpleListService from "../services/UserServices/SimpleListService";
 import User from "../models/User";
+import fs from "fs";
+
+const path = require("path");
 
 type IndexQuery = {
   searchParam: string;
@@ -20,6 +23,7 @@ type IndexQuery = {
 type ListQueryParams = {
   companyId: string;
 };
+
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
@@ -41,6 +45,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     password,
     name,
     profile,
+    urlPic,
     companyId: bodyCompanyId,
     queueIds,
     whatsappId,
@@ -68,11 +73,27 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError("ERR_NO_SUPER", 403);
   }
 
+  let newUrl = null;
+  if (urlPic) {
+    const base64Data = urlPic.replace(/^data:image\/\w+;base64,/, '');
+    const fileName = `${Date.now()}-${name}.jpg`; 
+    const uploadPath = path.resolve(__dirname,'..', '..','public');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    const filePath = path.join(uploadPath, fileName);
+    fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+    newUrl = `/public/${fileName}`;
+  }
+  console.log("newUrl", newUrl);
+
+
   const user = await CreateUserService({
     email,
     password,
     name,
     profile,
+    newUrl,
     companyId: newUserCompanyId,
     queueIds,
     whatsappId,
@@ -100,13 +121,27 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.profile !== "admin") {
-    throw new AppError("ERR_NO_PERMISSION", 403);
-  }
+  // if (req.user.profile !== "admin") {
+  //   throw new AppError("ERR_NO_PERMISSION", 403);
+  // }
 
   const { id: requestUserId, companyId } = req.user;
   const { userId } = req.params;
   const userData = req.body;
+
+  if (userData.urlPic) {
+    const base64Data = userData.urlPic.replace(/^data:image\/\w+;base64,/, '');
+    const fileName = `${Date.now()}-${userId}.jpg`; 
+    const uploadPath = path.resolve(__dirname,'..', '..','public');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    const filePath = path.join(uploadPath, fileName);
+    fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+    userData.urlPic = `/public/${fileName}`;
+  }
+
+
 
   const user = await UpdateUserService({
     userData,
@@ -156,3 +191,5 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
 
   return res.status(200).json(users);
 };
+
+

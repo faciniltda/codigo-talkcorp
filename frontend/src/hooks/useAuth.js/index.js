@@ -97,15 +97,26 @@ const useAuth = () => {
   }
   }, [socketManager, user]);
 
+  const getUserPic = async (userId) => {
+    try {
+      const { data } = await api.get(`/users/${userId}`);
+      localStorage.setItem("urlPic", data.urlPic);
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
   const handleLogin = async (userData) => {
     setLoading(true);
 
     try {
       const { data } = await api.post("/auth/login", userData);
+      console.log("data",data)
       const {
         user: { companyId, id, company },
       } = data;
-
+      getUserPic(id);
+          
       if (has(company, "settings") && isArray(company.settings)) {
         const setting = company.settings.find(
           (s) => s.key === "campaignsEnabled"

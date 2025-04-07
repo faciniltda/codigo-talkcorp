@@ -35,6 +35,9 @@ class User extends Model<User> {
 
   @Column
   email: string;
+
+  @Column
+  urlPic: string;
   
   @Column
   allTicket: string;

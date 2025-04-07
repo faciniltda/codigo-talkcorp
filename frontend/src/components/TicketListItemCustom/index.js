@@ -113,10 +113,12 @@ const useStyles = makeStyles((theme) => ({
   },
 
   createdTicketTime: {
-    justifySelf: "flex-end",
-    textAlign: "right",
-    position: "relative",
-    top: -15
+    fontSize: "0.75rem",
+    color: grey[600],
+    marginRight: "8px", 
+    whiteSpace: "nowrap", 
+    display: "flex",
+    alignItems: "center"
   },
 
   closedBadge: {
@@ -468,6 +470,17 @@ const useStyles = makeStyles((theme) => ({
                 </span>
               </Typography>
 
+              {ticket.userId !== null && ticket.createdAt && (
+                <Typography
+                  className={classes.createdTicketTime}
+                  component="span"
+                  variant="body2"
+                  color="textSecondary"
+                >
+                  {"Criado em " + format(parseISO(ticket.createdAt), "dd/MM/yyyy")}
+                </Typography>
+              )}
+
               <Badge
                 className={classes.newMessagesCount}
                 badgeContent={ticket.unreadMessages}
@@ -482,6 +495,8 @@ const useStyles = makeStyles((theme) => ({
         <ListItemSecondaryAction>
           {ticket.lastMessage && (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
+
+
               <Typography
                 className={classes.lastMessageTime}
                 component="span"
@@ -495,16 +510,7 @@ const useStyles = makeStyles((theme) => ({
                 )}
               </Typography>
               
-              {ticket.userId !== null && ticket.createdAt && (
-                <Typography
-                  className={classes.createdTicketTime}
-                  component="span"
-                  variant="body2"
-                  color="textSecondary"
-                >
-                  {"Criado em " + format(parseISO(ticket.createdAt), "dd/MM/yyyy")}
-                </Typography>
-              )}
+              
             </Box>
           )}
         </ListItemSecondaryAction>
