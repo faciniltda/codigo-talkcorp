@@ -5,6 +5,7 @@ import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 import Plan from "../../models/Plan";
 import Company from "../../models/Company";
+import { ne } from "sequelize/types/lib/operators";
 
 interface Request {
   email: string;
@@ -13,6 +14,7 @@ interface Request {
   queueIds?: number[];
   companyId?: number;
   profile?: string;
+  newUrl?: string;
   whatsappId?: number;
   allTicket?:string;
 }
@@ -31,6 +33,7 @@ const CreateUserService = async ({
   queueIds = [],
   companyId,
   profile = "admin",
+  newUrl,
   whatsappId,
   allTicket
 }: Request): Promise<Response> => {
@@ -81,7 +84,11 @@ const CreateUserService = async ({
   } catch (err) {
     throw new AppError(err.message);
   }
-
+  let urlPic = null;
+  if(newUrl !== undefined) {
+    urlPic = newUrl;
+  }
+  
   const user = await User.create(
     {
       email,
@@ -89,6 +96,7 @@ const CreateUserService = async ({
       name,
       companyId,
       profile,
+      urlPic,
       whatsappId: whatsappId || null,
 	  allTicket
     },

@@ -20,6 +20,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import CachedIcon from "@material-ui/icons/Cached";
+import api from "../services/api";
+
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -41,6 +43,7 @@ import { useDate } from "../hooks/useDate";
 import ColorModeContext from "../layout/themeContext";
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
+import { get } from "jquery";
 
 const drawerWidth = 240;
 
@@ -186,6 +189,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   // const [dueDate, setDueDate] = useState("");
   const { user } = useContext(AuthContext);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const theme = useTheme();
   const { colorMode } = useContext(ColorModeContext);
@@ -262,8 +266,13 @@ const LoggedInLayout = ({ children, themeToggle }) => {
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");
     const userId = localStorage.getItem("userId");
-
     const socket = socketManager.getSocket(companyId);
+
+
+    if (user && user.urlPic && user.urlPic !== "null") {
+      setImagePreview(`${process.env.REACT_APP_BACKEND_URL}${user.urlPic}`);
+      console.log("user.urlPic", user.urlPic);
+    }
 
     socket.on(`company-${companyId}-auth`, (data) => {
       if (data.user.id === +userId) {
@@ -280,13 +289,16 @@ const LoggedInLayout = ({ children, themeToggle }) => {
       socket.emit("userStatus");
     }, 1000 * 60 * 5);
 
+
     return () => {
       socket.disconnect();
       clearInterval(interval);
     };
-  }, [socketManager]);
+  }, [socketManager,user]);
+
 
   const handleMenu = (event) => {
+    console.log('user', user);
     setAnchorEl(event.currentTarget);
     setMenuOpen(true);
   };
@@ -431,7 +443,20 @@ const LoggedInLayout = ({ children, themeToggle }) => {
               variant="contained"
               style={{ color: "white" }}
             >
-              <AccountCircle />
+              {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="User"
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <AccountCircle />
+                )}
             </IconButton>
             <Menu
               id="menu-appbar"

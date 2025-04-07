@@ -26,6 +26,9 @@ import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import useWhatsApps from "../../hooks/useWhatsApps";
+import Avatar from "@material-ui/core/Avatar";
+
+
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -54,7 +57,20 @@ const useStyles = makeStyles(theme => ({
 	formControl: {
 		margin: theme.spacing(1),
 		minWidth: 120,
-	},
+	},avatarContainer: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginBottom: theme.spacing(2),
+    },
+    avatar: {
+        width: theme.spacing(10),
+        height: theme.spacing(10),
+        marginBottom: theme.spacing(1),
+    },
+    fileInput: {
+        display: "none",
+    },
 }));
 
 const UserSchema = Yup.object().shape({
@@ -73,6 +89,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		name: "",
 		email: "",
 		password: "",
+		urlPic: "",
 		profile: "user",
 		allTicket: "desabled"
 	};
@@ -83,6 +100,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [whatsappId, setWhatsappId] = useState(false);
 	const { loading, whatsApps } = useWhatsApps();
+	const [imagePreview, setImagePreview] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -92,6 +111,8 @@ const UserModal = ({ open, onClose, userId }) => {
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
+				
+				setImagePreview(process.env.REACT_APP_BACKEND_URL+data.urlPic);
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
 				setWhatsappId(data.whatsappId ? data.whatsappId : '');
@@ -103,14 +124,32 @@ const UserModal = ({ open, onClose, userId }) => {
 		fetchUser();
 	}, [userId, open]);
 
+	const handleImageChange = (event, setFieldValue) => {
+		const file = event.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => {
+				const imageUrl = reader.result;
+				setFieldValue("urlPic", imageUrl); // Atualiza corretamente no Formik
+				setImagePreview(imageUrl);
+			};
+		}
+	};
+	
+
 	const handleClose = () => {
 		onClose();
 		setUser(initialState);
 	};
 
+
+	console.log(imagePreview)
 	const handleSaveUser = async values => {
-		const userData = { ...values, whatsappId, queueIds: selectedQueueIds, allTicket: values.allTicket };
 		try {
+		
+			const userData = { ...values, whatsappId, queueIds: selectedQueueIds, allTicket: values.allTicket };
+			console.log('userData', userData);
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
 			} else {
@@ -148,9 +187,24 @@ const UserModal = ({ open, onClose, userId }) => {
 						}, 400);
 					}}
 				>
-					{({ touched, errors, isSubmitting }) => (
+					{({ touched, errors, isSubmitting,setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
+								<div className={classes.avatarContainer}>
+									<Avatar src={imagePreview} className={classes.avatar} />
+									<input
+										accept="image/*"
+										className={classes.fileInput}
+										id="profile-pic-upload"
+										type="file"
+										onChange={(event) => handleImageChange(event, setFieldValue)}
+									/>
+									<label htmlFor="profile-pic-upload">
+										<Button variant="outlined" color="primary" component="span">
+											Escolher Foto
+										</Button>
+									</label>
+								</div>
 								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
